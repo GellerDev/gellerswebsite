@@ -32,10 +32,20 @@ function updateCountdown() {
   const minutes = Math.floor(diff / (1000 * 60)) % 60;
   const seconds = Math.floor(diff / 1000) % 60;
 
-  document.getElementById('cd-days').textContent = days;
-  document.getElementById('cd-hours').textContent = hours;
-  document.getElementById('cd-minutes').textContent = minutes;
-  document.getElementById('cd-seconds').textContent = seconds;
+  setCountdownValue('cd-days', days);
+  setCountdownValue('cd-hours', hours);
+  setCountdownValue('cd-minutes', minutes);
+  setCountdownValue('cd-seconds', seconds);
+}
+
+// Update a number and replay the "tick" animation only when it changes
+function setCountdownValue(id, value) {
+  const el = document.getElementById(id);
+  if (el.textContent === String(value)) return;
+  el.textContent = value;
+  el.classList.remove('tick');
+  void el.offsetWidth; // force reflow so the animation restarts
+  el.classList.add('tick');
 }
 
 const timer = setInterval(updateCountdown, 1000);
@@ -54,6 +64,51 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.15 });
 
 document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+// =========================================================
+// 2a. TOP BAR, READING PROGRESS, BACK-TO-TOP
+// =========================================================
+const topbar = document.getElementById('topbar');
+const burger = document.getElementById('burger');
+const progressBar = document.getElementById('progress');
+const toTop = document.getElementById('to-top');
+const hero = document.getElementById('top');
+
+let scrollTicking = false;
+function onScroll() {
+  const scrolled = window.scrollY;
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const pastHero = scrolled > hero.offsetHeight * 0.8;
+
+  progressBar.style.setProperty('--progress', max > 0 ? scrolled / max : 0);
+  topbar.classList.toggle('topbar--visible', pastHero);
+  toTop.classList.toggle('is-visible', pastHero);
+  scrollTicking = false;
+}
+
+// Batch scroll work into one update per animation frame
+window.addEventListener('scroll', () => {
+  if (!scrollTicking) {
+    requestAnimationFrame(onScroll);
+    scrollTicking = true;
+  }
+}, { passive: true });
+onScroll();
+
+function setMenuOpen(open) {
+  topbar.classList.toggle('topbar--open', open);
+  burger.setAttribute('aria-expanded', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+
+burger.addEventListener('click', () => {
+  setMenuOpen(!topbar.classList.contains('topbar--open'));
+});
+
+// Close the mobile menu after picking a section
+document.querySelectorAll('#menu a').forEach((link) => {
+  link.addEventListener('click', () => setMenuOpen(false));
+});
 
 // =========================================================
 // 3. PERSONAL GREETING
