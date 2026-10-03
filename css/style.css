@@ -772,9 +772,12 @@ svg {
 }
 
 .timeline__fill {
-  width: 100%;
+  width: 3px;
+  margin-left: -1px;
+  border-radius: 2px;
   height: var(--fill, 0%);
-  background: var(--gold);
+  background: linear-gradient(to bottom, var(--gold-soft), var(--gold));
+  transition: height 0.2s linear;
 }
 
 .timeline__list {
@@ -818,6 +821,31 @@ svg {
   stroke-linecap: round;
   stroke-linejoin: round;
   transition: stroke 0.5s;
+}
+
+/* Lit up by JS once the gold line reaches the step */
+.timeline__item.is-active .timeline__dot {
+  border-color: var(--olive);
+  background: var(--olive);
+  box-shadow: 0 0 0 6px rgba(111, 127, 104, 0.15);
+  transform: scale(1.12);
+}
+
+.timeline__item.is-active .timeline__dot svg {
+  stroke: #fff;
+}
+
+/* Cards slide in from their own side */
+.js .timeline__item.reveal {
+  transform: translateX(-48px);
+}
+
+.js .timeline__item.reveal:nth-child(even) {
+  transform: translateX(48px);
+}
+
+.js .timeline__item.reveal.visible {
+  transform: none;
 }
 
 .timeline__card {
@@ -1323,6 +1351,16 @@ svg {
 
   .timeline__dot {
     grid-column: 1;
+  }
+
+  /* Single column on phones: every card slides in from the right */
+  .js .timeline__item.reveal,
+  .js .timeline__item.reveal:nth-child(even) {
+    transform: translateX(32px);
+  }
+
+  .js .timeline__item.reveal.visible {
+    transform: none;
   }
 
   .timeline__card,

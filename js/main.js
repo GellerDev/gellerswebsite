@@ -83,7 +83,26 @@ function onScroll() {
   progressBar.style.setProperty('--progress', max > 0 ? scrolled / max : 0);
   topbar.classList.toggle('topbar--visible', pastHero);
   toTop.classList.toggle('is-visible', pastHero);
+  updateTimeline();
   scrollTicking = false;
+}
+
+// Schedule: the gold line "draws" itself as you scroll and each
+// step lights up once the line reaches it
+const timeline = document.getElementById('timeline');
+const timelineFill = document.getElementById('timeline-fill');
+const timelineItems = timeline.querySelectorAll('.timeline__item');
+
+function updateTimeline() {
+  const focusLine = window.innerHeight * 0.6; // "reading point" on screen
+  const rect = timeline.getBoundingClientRect();
+  const progress = Math.min(Math.max((focusLine - rect.top) / rect.height, 0), 1);
+  timelineFill.style.setProperty('--fill', (progress * 100).toFixed(1) + '%');
+
+  timelineItems.forEach((item) => {
+    const dot = item.querySelector('.timeline__dot').getBoundingClientRect();
+    item.classList.toggle('is-active', dot.top + dot.height / 2 < focusLine);
+  });
 }
 
 // Batch scroll work into one update per animation frame
