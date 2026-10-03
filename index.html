@@ -81,6 +81,30 @@
   <!-- ===== 1. HERO ===== -->
   <section class="hero" id="top">
     <div class="hero__arch" aria-hidden="true"></div>
+    <canvas class="hero__petals" id="petals" aria-hidden="true"></canvas>
+
+    <!-- Olive sprigs in the corners (the same drawing is reused twice) -->
+    <svg width="0" height="0" class="visually-hidden" aria-hidden="true">
+      <defs>
+        <path id="leaf" d="M0 0C9-11 27-12 40 0C27 12 9 11 0 0Z"/>
+        <g id="sprig">
+          <path d="M100 300C96 240 108 170 98 110S88 30 96 0" fill="none" stroke="#6f7f68" stroke-width="1.2"/>
+          <use href="#leaf" transform="translate(99 262) rotate(-150)"/>
+          <use href="#leaf" transform="translate(100 248) rotate(-35)"/>
+          <use href="#leaf" transform="translate(103 210) rotate(-145)"/>
+          <use href="#leaf" transform="translate(104 196) rotate(-30)"/>
+          <use href="#leaf" transform="translate(103 158) rotate(-150)"/>
+          <use href="#leaf" transform="translate(101 144) rotate(-38)"/>
+          <use href="#leaf" transform="translate(96 106) rotate(-140)"/>
+          <use href="#leaf" transform="translate(94 92) rotate(-40)"/>
+          <use href="#leaf" transform="translate(92 56) rotate(-135)"/>
+          <use href="#leaf" transform="translate(93 42) rotate(-50)"/>
+          <use href="#leaf" transform="translate(96 4) rotate(-95) scale(0.8)"/>
+        </g>
+      </defs>
+    </svg>
+    <svg class="sprig sprig--left" viewBox="0 0 200 300" aria-hidden="true"><use href="#sprig"/></svg>
+    <svg class="sprig sprig--right" viewBox="0 0 200 300" aria-hidden="true"><use href="#sprig"/></svg>
 
     <div class="hero__inner">
       <p class="hero__eyebrow">Приглашение на свадьбу</p>
@@ -359,6 +383,7 @@
     <svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg>
   </a>
 
+  <script src="js/effects.js" defer></script>
   <script src="js/intro.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
