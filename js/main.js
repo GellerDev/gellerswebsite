@@ -236,6 +236,38 @@ form.querySelectorAll('input[name="attend"]').forEach((radio) => {
   });
 });
 
+// Guest counter (− N +), stored in the hidden "guests" input
+const MIN_GUESTS = 1;
+const MAX_GUESTS = 5;
+const guestsInput = document.getElementById('guests');
+const guestsValue = document.getElementById('guests-value');
+const guestsUnit = document.getElementById('guests-unit');
+const stepButtons = form.querySelectorAll('.stepper__btn');
+
+// 1 человек, 2–4 человека, 5 человек
+function peopleWord(n) {
+  return n >= 2 && n <= 4 ? 'человека' : 'человек';
+}
+
+function setGuests(n) {
+  guestsInput.value = n;
+  guestsValue.textContent = n;
+  guestsUnit.textContent = peopleWord(n);
+  stepButtons[0].disabled = n <= MIN_GUESTS;
+  stepButtons[1].disabled = n >= MAX_GUESTS;
+  guestsValue.classList.remove('tick');
+  void guestsValue.offsetWidth; // restart the animation
+  guestsValue.classList.add('tick');
+}
+
+stepButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    const next = Number(guestsInput.value) + Number(button.dataset.step);
+    setGuests(Math.min(Math.max(next, MIN_GUESTS), MAX_GUESTS));
+  });
+});
+setGuests(1);
+
 function showError(message) {
   errorBox.textContent = message;
   errorBox.hidden = false;
@@ -270,8 +302,14 @@ form.addEventListener('submit', async (event) => {
     const result = await response.json();
     if (result.result !== 'success') throw new Error(result.error);
 
+    const thanks = document.getElementById('rsvp-thanks');
+    if (!attends) {
+      document.getElementById('rsvp-thanks-text').textContent =
+        'Очень жаль, что вы не сможете прийти. Спасибо, что сообщили!';
+    }
     form.hidden = true;
-    document.getElementById('rsvp-thanks').hidden = false;
+    thanks.hidden = false;
+    if (attends && window.launchConfetti) window.launchConfetti(thanks);
   } catch (error) {
     console.error('RSVP submission failed:', error);
     showError('Не получилось отправить ответ. Попробуйте ещё раз или позвоните нам.');

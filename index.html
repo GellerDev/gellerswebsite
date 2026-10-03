@@ -346,15 +346,16 @@
 
           <!-- Hidden when the guest answers "no" -->
           <div class="form__details" id="attend-details">
-            <label class="form__field">
-              <span class="form__label">Сколько вас будет?</span>
-              <select name="guests">
-                <option value="1">Я один / одна</option>
-                <option value="2">Нас двое</option>
-                <option value="3">Нас трое</option>
-                <option value="4">Нас четверо</option>
-              </select>
-            </label>
+            <div class="form__field">
+              <span class="form__label" id="guests-label">Сколько вас будет?</span>
+              <div class="stepper" role="group" aria-labelledby="guests-label">
+                <button type="button" class="stepper__btn" data-step="-1" aria-label="Меньше">−</button>
+                <output class="stepper__value" id="guests-value" aria-live="polite">1</output>
+                <button type="button" class="stepper__btn" data-step="1" aria-label="Больше">+</button>
+                <span class="stepper__unit" id="guests-unit">человек</span>
+              </div>
+              <input type="hidden" name="guests" id="guests" value="1">
+            </div>
 
             <fieldset class="form__field">
               <legend class="form__label">Что предпочитаете из напитков?</legend>
@@ -378,8 +379,9 @@
         </form>
 
         <div class="form__thanks" id="rsvp-thanks" hidden>
+          <svg class="form__thanks-heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
           <p class="form__thanks-title">Спасибо!</p>
-          <p>Ваш ответ получен. До встречи на празднике!</p>
+          <p id="rsvp-thanks-text">Ваш ответ получен. До встречи на празднике!</p>
         </div>
       </div>
     </section>

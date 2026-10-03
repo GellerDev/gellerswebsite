@@ -115,3 +115,77 @@
   resize();
   updateRunning();
 })();
+
+// =========================================================
+// CONFETTI
+// window.launchConfetti(element) bursts confetti from the centre of
+// the given element. Does nothing for "reduce motion" visitors.
+// =========================================================
+window.launchConfetti = function (origin) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const canvas = document.createElement('canvas');
+  canvas.className = 'confetti';
+  document.body.appendChild(canvas);
+
+  const ctx = canvas.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const rect = origin.getBoundingClientRect();
+  const startX = rect.left + rect.width / 2;
+  const startY = rect.top + rect.height / 2;
+  const COLORS = ['#b8956a', '#d8c3a5', '#a8b5a0', '#6f7f68', '#ead9cc', '#ffffff'];
+
+  const pieces = Array.from({ length: 150 }, () => {
+    const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.1; // mostly upwards
+    const speed = 6 + Math.random() * 9;
+    return {
+      x: startX,
+      y: startY,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      size: 5 + Math.random() * 6,
+      rotation: Math.random() * Math.PI,
+      spin: (Math.random() - 0.5) * 0.3,
+      round: Math.random() < 0.3,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+    };
+  });
+
+  const started = performance.now();
+  function frame(now) {
+    const elapsed = now - started;
+    ctx.clearRect(0, 0, width, height);
+    ctx.globalAlpha = Math.max(0, 1 - Math.max(0, elapsed - 2200) / 800); // fade out at the end
+
+    pieces.forEach((p) => {
+      p.vy += 0.25;  // gravity
+      p.vx *= 0.985; // air resistance
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rotation += p.spin;
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation);
+      ctx.fillStyle = p.color;
+      if (p.round) {
+        ctx.beginPath();
+        ctx.arc(0, 0, p.size / 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+      }
+      ctx.restore();
+    });
+
+    if (elapsed < 3000) requestAnimationFrame(frame);
+    else canvas.remove();
+  }
+  requestAnimationFrame(frame);
+};
