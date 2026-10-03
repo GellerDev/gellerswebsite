@@ -26,10 +26,41 @@
 
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- Lets CSS know JS is running (scroll animations hide content only then) -->
-  <script>document.documentElement.classList.add('js');</script>
+  <!-- Lets CSS know JS is running (scroll animations hide content only then).
+       Skips the envelope intro if it was already opened this session or ?intro=0. -->
+  <script>
+    document.documentElement.classList.add('js');
+    try {
+      if (sessionStorage.getItem('introSeen') || /[?&]intro=0/.test(location.search)) {
+        document.documentElement.classList.add('intro-done');
+      }
+    } catch (e) {}
+  </script>
 </head>
 <body>
+
+  <!-- ===== ENVELOPE INTRO (shown once per session, see js/intro.js) ===== -->
+  <div class="intro" id="intro">
+    <div class="intro__inner">
+      <p class="intro__to" id="intro-to">Вам приглашение</p>
+
+      <div class="envelope" id="envelope">
+        <div class="envelope__back"></div>
+        <div class="envelope__letter" aria-hidden="true">
+          <p class="envelope__letter-pre">Мы женимся</p>
+          <p class="envelope__letter-names">Роман <span>&</span> Виолетта</p>
+          <p class="envelope__letter-date">02 · 06 · 2027</p>
+        </div>
+        <div class="envelope__pocket"></div>
+        <div class="envelope__flap"></div>
+        <button class="envelope__seal" id="seal" type="button" aria-label="Открыть приглашение">
+          Р<span>&</span>В
+        </button>
+      </div>
+
+      <p class="intro__hint">Нажмите на печать, чтобы открыть</p>
+    </div>
+  </div>
 
   <!-- ===== STICKY TOP BAR (appears after the hero) ===== -->
   <header class="topbar" id="topbar">
@@ -328,6 +359,7 @@
     <svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg>
   </a>
 
+  <script src="js/intro.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 </html>
