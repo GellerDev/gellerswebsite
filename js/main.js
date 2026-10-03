@@ -32,10 +32,20 @@ function updateCountdown() {
   const minutes = Math.floor(diff / (1000 * 60)) % 60;
   const seconds = Math.floor(diff / 1000) % 60;
 
-  document.getElementById('cd-days').textContent = days;
-  document.getElementById('cd-hours').textContent = hours;
-  document.getElementById('cd-minutes').textContent = minutes;
-  document.getElementById('cd-seconds').textContent = seconds;
+  setCountdownValue('cd-days', days);
+  setCountdownValue('cd-hours', hours);
+  setCountdownValue('cd-minutes', minutes);
+  setCountdownValue('cd-seconds', seconds);
+}
+
+// Update a number and replay the "tick" animation only when it changes
+function setCountdownValue(id, value) {
+  const el = document.getElementById(id);
+  if (el.textContent === String(value)) return;
+  el.textContent = value;
+  el.classList.remove('tick');
+  void el.offsetWidth; // force reflow so the animation restarts
+  el.classList.add('tick');
 }
 
 const timer = setInterval(updateCountdown, 1000);
@@ -54,6 +64,106 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.15 });
 
 document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+// =========================================================
+// 2a. TOP BAR, READING PROGRESS, BACK-TO-TOP
+// =========================================================
+const topbar = document.getElementById('topbar');
+const burger = document.getElementById('burger');
+const progressBar = document.getElementById('progress');
+const toTop = document.getElementById('to-top');
+const hero = document.getElementById('top');
+
+let scrollTicking = false;
+function onScroll() {
+  const scrolled = window.scrollY;
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const pastHero = scrolled > hero.offsetHeight * 0.8;
+
+  progressBar.style.setProperty('--progress', max > 0 ? scrolled / max : 0);
+  topbar.classList.toggle('topbar--visible', pastHero);
+  toTop.classList.toggle('is-visible', pastHero);
+  updateTimeline();
+  scrollTicking = false;
+}
+
+// Schedule: the gold line "draws" itself as you scroll and each
+// step lights up once the line reaches it
+const timeline = document.getElementById('timeline');
+const timelineFill = document.getElementById('timeline-fill');
+const timelineItems = timeline.querySelectorAll('.timeline__item');
+
+function updateTimeline() {
+  const focusLine = window.innerHeight * 0.6; // "reading point" on screen
+  const rect = timeline.getBoundingClientRect();
+  const progress = Math.min(Math.max((focusLine - rect.top) / rect.height, 0), 1);
+  timelineFill.style.setProperty('--fill', (progress * 100).toFixed(1) + '%');
+
+  timelineItems.forEach((item) => {
+    const dot = item.querySelector('.timeline__dot').getBoundingClientRect();
+    item.classList.toggle('is-active', dot.top + dot.height / 2 < focusLine);
+  });
+}
+
+// Batch scroll work into one update per animation frame
+window.addEventListener('scroll', () => {
+  if (!scrollTicking) {
+    requestAnimationFrame(onScroll);
+    scrollTicking = true;
+  }
+}, { passive: true });
+onScroll();
+
+function setMenuOpen(open) {
+  topbar.classList.toggle('topbar--open', open);
+  burger.setAttribute('aria-expanded', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+
+burger.addEventListener('click', () => {
+  setMenuOpen(!topbar.classList.contains('topbar--open'));
+});
+
+// Close the mobile menu after picking a section
+document.querySelectorAll('#menu a').forEach((link) => {
+  link.addEventListener('click', () => setMenuOpen(false));
+});
+
+// =========================================================
+// 2b. DRESS CODE: "try on" a colour — tints the section background
+// =========================================================
+const dressSection = document.getElementById('dresscode');
+const paletteCaption = document.getElementById('palette-caption');
+const swatches = document.querySelectorAll('.palette__item');
+
+swatches.forEach((swatch) => {
+  swatch.addEventListener('click', () => {
+    const wasSelected = swatch.getAttribute('aria-pressed') === 'true';
+    swatches.forEach((s) => s.setAttribute('aria-pressed', 'false'));
+
+    if (wasSelected) {
+      dressSection.style.removeProperty('--dress-bg');
+      paletteCaption.textContent = 'Нажмите на цвет, чтобы примерить';
+      return;
+    }
+
+    swatch.setAttribute('aria-pressed', 'true');
+    const colour = swatch.style.getPropertyValue('--c');
+    dressSection.style.setProperty('--dress-bg', `color-mix(in srgb, ${colour} 35%, #f3ede4)`);
+    paletteCaption.textContent = swatch.querySelector('.palette__name').textContent;
+  });
+});
+
+// =========================================================
+// 2c. FLIP CARDS
+// =========================================================
+document.querySelectorAll('.flip').forEach((card) => {
+  const button = card.querySelector('.flip__inner');
+  button.addEventListener('click', () => {
+    const flipped = card.classList.toggle('is-flipped');
+    button.setAttribute('aria-pressed', flipped);
+  });
+});
 
 // =========================================================
 // 3. PERSONAL GREETING
@@ -126,6 +236,38 @@ form.querySelectorAll('input[name="attend"]').forEach((radio) => {
   });
 });
 
+// Guest counter (− N +), stored in the hidden "guests" input
+const MIN_GUESTS = 1;
+const MAX_GUESTS = 5;
+const guestsInput = document.getElementById('guests');
+const guestsValue = document.getElementById('guests-value');
+const guestsUnit = document.getElementById('guests-unit');
+const stepButtons = form.querySelectorAll('.stepper__btn');
+
+// 1 человек, 2–4 человека, 5 человек
+function peopleWord(n) {
+  return n >= 2 && n <= 4 ? 'человека' : 'человек';
+}
+
+function setGuests(n) {
+  guestsInput.value = n;
+  guestsValue.textContent = n;
+  guestsUnit.textContent = peopleWord(n);
+  stepButtons[0].disabled = n <= MIN_GUESTS;
+  stepButtons[1].disabled = n >= MAX_GUESTS;
+  guestsValue.classList.remove('tick');
+  void guestsValue.offsetWidth; // restart the animation
+  guestsValue.classList.add('tick');
+}
+
+stepButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    const next = Number(guestsInput.value) + Number(button.dataset.step);
+    setGuests(Math.min(Math.max(next, MIN_GUESTS), MAX_GUESTS));
+  });
+});
+setGuests(1);
+
 function showError(message) {
   errorBox.textContent = message;
   errorBox.hidden = false;
@@ -160,8 +302,14 @@ form.addEventListener('submit', async (event) => {
     const result = await response.json();
     if (result.result !== 'success') throw new Error(result.error);
 
+    const thanks = document.getElementById('rsvp-thanks');
+    if (!attends) {
+      document.getElementById('rsvp-thanks-text').textContent =
+        'Очень жаль, что вы не сможете прийти. Спасибо, что сообщили!';
+    }
     form.hidden = true;
-    document.getElementById('rsvp-thanks').hidden = false;
+    thanks.hidden = false;
+    if (attends && window.launchConfetti) window.launchConfetti(thanks);
   } catch (error) {
     console.error('RSVP submission failed:', error);
     showError('Не получилось отправить ответ. Попробуйте ещё раз или позвоните нам.');
