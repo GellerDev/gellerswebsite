@@ -1,0 +1,171 @@
+// =========================================================
+// SITE CONFIG — everything you may need to change lives here
+// =========================================================
+const CONFIG = {
+  // +05:00 is Yekaterinburg time, so the countdown is correct
+  // even for guests opening the site from another time zone.
+  weddingStart: new Date('2027-06-02T15:00:00+05:00'),
+  weddingEnd: new Date('2027-06-02T23:00:00+05:00'),
+  eventTitle: 'Свадьба Романа и Виолетты',
+  eventLocation: 'Екатеринбург', // TODO: venue address once booked
+
+  // Google Apps Script web app that stores RSVP answers.
+  // Setup instructions: google-apps-script/rsvp.gs
+  rsvpUrl: 'https://script.google.com/macros/s/AKfycbzLPIXjBYB2dGSinFC3nax5s-Xd7eUdBW3B_ZeBoAKVzPsoj2vC7ty7K8EUThcqtHop/exec',
+};
+
+// =========================================================
+// 1. COUNTDOWN
+// =========================================================
+function updateCountdown() {
+  const diff = CONFIG.weddingStart - new Date(); // milliseconds left
+
+  if (diff <= 0) {
+    document.getElementById('countdown').innerHTML =
+      '<p class="hero__date">Этот день настал!</p>';
+    clearInterval(timer);
+    return;
+  }
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+  const minutes = Math.floor(diff / (1000 * 60)) % 60;
+  const seconds = Math.floor(diff / 1000) % 60;
+
+  document.getElementById('cd-days').textContent = days;
+  document.getElementById('cd-hours').textContent = hours;
+  document.getElementById('cd-minutes').textContent = minutes;
+  document.getElementById('cd-seconds').textContent = seconds;
+}
+
+const timer = setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// =========================================================
+// 2. REVEAL SECTIONS ON SCROLL
+// =========================================================
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target); // animate only once
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+// =========================================================
+// 3. PERSONAL GREETING
+// A link like  https://<site>/?guest=Дорогая бабушка
+// replaces the "Дорогие гости!" title with "Дорогая бабушка!"
+// =========================================================
+const guest = new URLSearchParams(window.location.search).get('guest');
+if (guest) {
+  // textContent (not innerHTML) so the URL cannot inject markup
+  document.getElementById('invite-title').textContent = guest.trim().slice(0, 80) + '!';
+}
+
+// =========================================================
+// 4. ADD TO CALENDAR
+// =========================================================
+// Calendar date format: 20270602T100000Z
+function toCalendarDate(date) {
+  return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+}
+
+const calendarDates = toCalendarDate(CONFIG.weddingStart) + '/' + toCalendarDate(CONFIG.weddingEnd);
+
+// Google Calendar: a plain link with query parameters
+document.getElementById('calendar-google').href =
+  'https://calendar.google.com/calendar/render?' +
+  new URLSearchParams({
+    action: 'TEMPLATE',
+    text: CONFIG.eventTitle,
+    dates: calendarDates,
+    location: CONFIG.eventLocation,
+    details: 'Подробности: ' + window.location.origin + window.location.pathname,
+  });
+
+// iPhone / Outlook: download an .ics file every calendar app understands
+document.getElementById('calendar-ics').addEventListener('click', () => {
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Wedding//RU',
+    'BEGIN:VEVENT',
+    'UID:wedding-20270602@gellerdev.github.io',
+    'DTSTAMP:' + toCalendarDate(new Date()),
+    'DTSTART:' + toCalendarDate(CONFIG.weddingStart),
+    'DTEND:' + toCalendarDate(CONFIG.weddingEnd),
+    'SUMMARY:' + CONFIG.eventTitle,
+    'LOCATION:' + CONFIG.eventLocation,
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\r\n');
+
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+  link.download = 'wedding.ics';
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000); // free memory after the download starts
+});
+
+// =========================================================
+// 5. RSVP FORM
+// =========================================================
+const form = document.getElementById('rsvp-form');
+const attendDetails = document.getElementById('attend-details');
+const submitButton = document.getElementById('rsvp-submit');
+const errorBox = document.getElementById('rsvp-error');
+
+// Hide guest count and drinks when the guest is not coming
+form.querySelectorAll('input[name="attend"]').forEach((radio) => {
+  radio.addEventListener('change', () => {
+    attendDetails.hidden = radio.value === 'no';
+  });
+});
+
+function showError(message) {
+  errorBox.textContent = message;
+  errorBox.hidden = false;
+}
+
+form.addEventListener('submit', async (event) => {
+  event.preventDefault(); // stay on the page
+  errorBox.hidden = true;
+
+  if (!CONFIG.rsvpUrl) {
+    console.error('CONFIG.rsvpUrl is not set');
+    showError('Анкета временно недоступна. Пожалуйста, свяжитесь с нами по телефону.');
+    return;
+  }
+
+  const data = new FormData(form);
+  const attends = data.get('attend') === 'yes';
+  // URL-encoded body = "simple" CORS request, no preflight needed for Apps Script
+  const answer = new URLSearchParams({
+    name: data.get('name').trim(),
+    attend: data.get('attend'),
+    guests: attends ? data.get('guests') : '0',
+    drinks: attends ? data.getAll('drinks').join(', ') : '',
+    comment: data.get('comment').trim(),
+  });
+
+  submitButton.disabled = true;
+  submitButton.textContent = 'Отправляем…';
+
+  try {
+    const response = await fetch(CONFIG.rsvpUrl, { method: 'POST', body: answer });
+    const result = await response.json();
+    if (result.result !== 'success') throw new Error(result.error);
+
+    form.hidden = true;
+    document.getElementById('rsvp-thanks').hidden = false;
+  } catch (error) {
+    console.error('RSVP submission failed:', error);
+    showError('Не получилось отправить ответ. Попробуйте ещё раз или позвоните нам.');
+    submitButton.disabled = false;
+    submitButton.textContent = 'Отправить';
+  }
+});

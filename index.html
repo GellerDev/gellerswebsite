@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Роман & Виолетта — свадьба</title>
+  <meta name="description" content="Приглашение на нашу свадьбу 2 июня 2027">
+
+  <!-- Private event: keep the page out of search engines (see also robots.txt) -->
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Link preview in messengers (Telegram, WhatsApp, VK) -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:url" content="https://gellerdev.github.io/gellerswebsite/">
+  <meta property="og:title" content="Роман & Виолетта — свадьба">
+  <meta property="og:description" content="2 июня 2027 · Екатеринбург. Будем рады видеть вас на нашем празднике!">
+
+  <meta name="theme-color" content="#fbf8f3">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+
+  <!-- Fonts (both support Cyrillic) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===== 1. HERO ===== -->
+  <header class="hero">
+    <div class="hero__frame">
+      <p class="hero__pre">Мы женимся!</p>
+      <h1 class="hero__names">Роман <span class="amp">&</span> Виолетта</h1>
+      <div class="divider"></div>
+      <p class="hero__date">2 июня 2027</p>
+      <p class="hero__place">Екатеринбург</p>
+
+      <div class="countdown" id="countdown">
+        <div class="countdown__item"><span id="cd-days">0</span><small>дней</small></div>
+        <div class="countdown__item"><span id="cd-hours">0</span><small>часов</small></div>
+        <div class="countdown__item"><span id="cd-minutes">0</span><small>минут</small></div>
+        <div class="countdown__item"><span id="cd-seconds">0</span><small>секунд</small></div>
+      </div>
+
+      <a href="#rsvp" class="btn">Подтвердить присутствие</a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===== 2. INVITATION ===== -->
+    <section class="section reveal" id="invite">
+      <!-- The title can be personalised via ?guest=... in the URL (see js/main.js) -->
+      <h2 class="section__title" id="invite-title">Дорогие гости!</h2>
+      <p class="section__text">
+        Совсем скоро состоится самый важный день в нашей жизни, и мы очень хотим
+        провести его в кругу самых близких людей. Будем счастливы видеть вас
+        на нашей свадьбе!
+      </p>
+
+      <p class="calendar__label">Сохраните дату</p>
+      <div class="calendar">
+        <a class="btn btn--outline" id="calendar-google" href="#" target="_blank" rel="noopener">Google Календарь</a>
+        <button class="btn btn--outline" id="calendar-ics" type="button">iPhone / Outlook</button>
+      </div>
+    </section>
+
+    <!-- ===== 3. SCHEDULE ===== -->
+    <section class="section section--tinted reveal" id="program">
+      <h2 class="section__title">Программа дня</h2>
+      <!-- TODO: confirm times and events -->
+      <ol class="timeline">
+        <li class="timeline__item">
+          <span class="timeline__time">15:00</span>
+          <div>
+            <h3>Сбор гостей</h3>
+            <p>Welcome-зона, лёгкие закуски и знакомство</p>
+          </div>
+        </li>
+        <li class="timeline__item">
+          <span class="timeline__time">15:30</span>
+          <div>
+            <h3>Церемония</h3>
+            <p>Самый трогательный момент дня</p>
+          </div>
+        </li>
+        <li class="timeline__item">
+          <span class="timeline__time">16:30</span>
+          <div>
+            <h3>Фуршет и фотосессия</h3>
+            <p>Время для общих фото и поздравлений</p>
+          </div>
+        </li>
+        <li class="timeline__item">
+          <span class="timeline__time">17:30</span>
+          <div>
+            <h3>Праздничный ужин</h3>
+            <p>Тосты, танцы и много радости</p>
+          </div>
+        </li>
+        <li class="timeline__item">
+          <span class="timeline__time">23:00</span>
+          <div>
+            <h3>Завершение вечера</h3>
+            <p>Обнимаемся и прощаемся до новых встреч</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ===== 4. VENUE ===== -->
+    <section class="section reveal" id="location">
+      <h2 class="section__title">Место проведения</h2>
+      <!-- TODO: venue name and address once booked -->
+      <p class="location__name">Екатеринбург</p>
+      <p class="section__text">Площадка уточняется — мы сообщим адрес совсем скоро</p>
+      <!-- TODO: uncomment once the venue is known and paste a map link
+           (Yandex Maps → Share → Copy link)
+      <a class="btn btn--outline" href="MAP_LINK" target="_blank" rel="noopener">
+        Открыть на карте
+      </a>
+      -->
+    </section>
+
+    <!-- ===== 5. DRESS CODE ===== -->
+    <section class="section section--tinted reveal" id="dresscode">
+      <h2 class="section__title">Дресс-код</h2>
+      <p class="section__text">
+        Будем рады, если вы поддержите цветовую гамму нашего праздника
+      </p>
+      <!-- TODO: confirm palette (each colour is set via style="--c: ...") -->
+      <div class="palette">
+        <span class="palette__color" style="--c: #f3ede4" title="Молочный"></span>
+        <span class="palette__color" style="--c: #d9c7b0" title="Бежевый"></span>
+        <span class="palette__color" style="--c: #a8b5a0" title="Шалфей"></span>
+        <span class="palette__color" style="--c: #6f7f68" title="Оливковый"></span>
+        <span class="palette__color" style="--c: #c9a27e" title="Карамель"></span>
+      </div>
+    </section>
+
+    <!-- ===== 6. NOTES FOR GUESTS ===== -->
+    <section class="section reveal" id="details">
+      <h2 class="section__title">Пожелания</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>Подарки</h3>
+          <p>Мы будем благодарны за вклад в бюджет нашей молодой семьи в конверте.</p>
+        </div>
+        <div class="card">
+          <h3>Цветы</h3>
+          <p>Пожалуйста, не дарите нам цветы — вместо них можно подарить бутылочку любимого вина.</p>
+        </div>
+        <div class="card">
+          <h3>Фото</h3>
+          <p>Делитесь кадрами со свадьбы — мы соберём их в общий альбом.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 7. RSVP ===== -->
+    <section class="section section--tinted reveal" id="rsvp">
+      <h2 class="section__title">Анкета гостя</h2>
+      <!-- TODO: confirm RSVP deadline -->
+      <p class="section__text">Пожалуйста, подтвердите своё присутствие до 1 мая 2027</p>
+
+      <!-- Option values are in English: they end up in the responses spreadsheet -->
+      <form class="form" id="rsvp-form">
+        <label class="form__field">
+          <span>Ваше имя и фамилия</span>
+          <input type="text" name="name" required maxlength="200" autocomplete="name" placeholder="Иван Иванов">
+        </label>
+
+        <fieldset class="form__field">
+          <legend>Сможете ли вы прийти?</legend>
+          <label class="choice"><input type="radio" name="attend" value="yes" required> Да, с удовольствием!</label>
+          <label class="choice"><input type="radio" name="attend" value="no"> К сожалению, не смогу</label>
+        </fieldset>
+
+        <!-- Hidden when the guest answers "no" -->
+        <div id="attend-details">
+          <label class="form__field">
+            <span>Сколько вас будет?</span>
+            <select name="guests">
+              <option value="1">Я один / одна</option>
+              <option value="2">Нас двое</option>
+              <option value="3">Нас трое</option>
+              <option value="4">Нас четверо</option>
+            </select>
+          </label>
+
+          <fieldset class="form__field">
+            <legend>Что предпочитаете из напитков?</legend>
+            <label class="choice"><input type="checkbox" name="drinks" value="White wine"> Белое вино</label>
+            <label class="choice"><input type="checkbox" name="drinks" value="Red wine"> Красное вино</label>
+            <label class="choice"><input type="checkbox" name="drinks" value="Champagne"> Шампанское</label>
+            <label class="choice"><input type="checkbox" name="drinks" value="Spirits"> Крепкие напитки</label>
+            <label class="choice"><input type="checkbox" name="drinks" value="Non-alcoholic"> Безалкогольные</label>
+          </fieldset>
+        </div>
+
+        <label class="form__field">
+          <span>Комментарий (аллергии, пожелания)</span>
+          <textarea name="comment" rows="3" maxlength="1000"></textarea>
+        </label>
+
+        <p class="form__error" id="rsvp-error" role="alert" hidden></p>
+        <button type="submit" class="btn" id="rsvp-submit">Отправить</button>
+      </form>
+
+      <div class="form__thanks" id="rsvp-thanks" hidden>
+        <h3>Спасибо!</h3>
+        <p>Ваш ответ получен. До встречи на празднике!</p>
+      </div>
+    </section>
+
+    <!-- ===== 8. CONTACTS ===== -->
+    <section class="section reveal" id="contacts">
+      <h2 class="section__title">Остались вопросы?</h2>
+      <p class="section__text">Звоните или пишите нашему организатору</p>
+      <!-- TODO: organiser name and phone -->
+      <p class="location__name">Имя Организатора</p>
+      <a class="contact-link" href="tel:+70000000000">+7 (000) 000-00-00</a>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>С любовью, Роман & Виолетта</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
