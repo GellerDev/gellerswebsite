@@ -130,6 +130,42 @@ document.querySelectorAll('#menu a').forEach((link) => {
 });
 
 // =========================================================
+// 2b. DRESS CODE: "try on" a colour — tints the section background
+// =========================================================
+const dressSection = document.getElementById('dresscode');
+const paletteCaption = document.getElementById('palette-caption');
+const swatches = document.querySelectorAll('.palette__item');
+
+swatches.forEach((swatch) => {
+  swatch.addEventListener('click', () => {
+    const wasSelected = swatch.getAttribute('aria-pressed') === 'true';
+    swatches.forEach((s) => s.setAttribute('aria-pressed', 'false'));
+
+    if (wasSelected) {
+      dressSection.style.removeProperty('--dress-bg');
+      paletteCaption.textContent = 'Нажмите на цвет, чтобы примерить';
+      return;
+    }
+
+    swatch.setAttribute('aria-pressed', 'true');
+    const colour = swatch.style.getPropertyValue('--c');
+    dressSection.style.setProperty('--dress-bg', `color-mix(in srgb, ${colour} 35%, #f3ede4)`);
+    paletteCaption.textContent = swatch.querySelector('.palette__name').textContent;
+  });
+});
+
+// =========================================================
+// 2c. FLIP CARDS
+// =========================================================
+document.querySelectorAll('.flip').forEach((card) => {
+  const button = card.querySelector('.flip__inner');
+  button.addEventListener('click', () => {
+    const flipped = card.classList.toggle('is-flipped');
+    button.setAttribute('aria-pressed', flipped);
+  });
+});
+
+// =========================================================
 // 3. PERSONAL GREETING
 // A link like  https://<site>/?guest=Дорогая бабушка
 // replaces the "Дорогие гости!" title with "Дорогая бабушка!"

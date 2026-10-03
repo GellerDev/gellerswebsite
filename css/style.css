@@ -943,11 +943,46 @@ svg {
   list-style: none;
 }
 
+/* Section tint follows the selected swatch (set by JS) */
+#dresscode {
+  background: var(--dress-bg, var(--cream));
+  transition: background 0.9s var(--ease);
+}
+
 .palette__item {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.palette__item:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 6px;
+}
+
+.palette__item[aria-pressed="true"] .palette__swatch {
+  transform: translateY(-6px) scale(1.12);
+  box-shadow: 0 0 0 2px var(--gold), var(--shadow);
+}
+
+.palette__item[aria-pressed="true"] .palette__name {
+  color: var(--text);
+}
+
+.palette__caption {
+  min-height: 1.4em;
+  margin-top: 36px;
+  font-family: var(--script);
+  font-size: clamp(32px, 6vw, 44px);
+  line-height: 1.4;
+  text-align: center;
+  color: var(--olive);
 }
 
 .palette__swatch {
@@ -983,17 +1018,81 @@ svg {
   margin: 0 auto;
 }
 
-.card {
-  padding: 44px 28px;
-  border: 1px solid var(--line);
-  background: #fff;
-  text-align: center;
-  transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+/* Flip card: a 3D button with a front and a back face */
+.flip {
+  height: 300px;
+  perspective: 1200px;
 }
 
-.card:hover {
-  transform: translateY(-6px);
+.flip__inner {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.9s var(--ease);
+}
+
+.flip__inner:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+}
+
+.flip.is-flipped .flip__inner {
+  transform: rotateY(180deg);
+}
+
+.flip__face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 28px;
+  border: 1px solid var(--line);
+  background: #fff;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: box-shadow 0.5s var(--ease);
+}
+
+.flip:hover .flip__face {
   box-shadow: var(--shadow);
+}
+
+.flip__back {
+  border-color: var(--olive);
+  background: var(--olive);
+  color: var(--ivory);
+  transform: rotateY(180deg);
+}
+
+.flip__title {
+  display: block;
+  margin-bottom: 10px;
+  font-family: var(--serif);
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.flip__hint {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.flip__text {
+  font-size: 15px;
+  line-height: 1.7;
 }
 
 .card__icon {
@@ -1014,16 +1113,6 @@ svg {
   stroke-width: 1.3;
   stroke-linecap: round;
   stroke-linejoin: round;
-}
-
-.card h3 {
-  margin-bottom: 10px;
-  font-size: 30px;
-}
-
-.card p {
-  font-size: 14px;
-  color: var(--muted);
 }
 
 /* =========================================================
@@ -1290,8 +1379,8 @@ svg {
   transform: none;
 }
 
-.cards .card:nth-child(2) { transition-delay: 0.12s; }
-.cards .card:nth-child(3) { transition-delay: 0.24s; }
+.cards .flip:nth-child(2) { transition-delay: 0.12s; }
+.cards .flip:nth-child(3) { transition-delay: 0.24s; }
 
 /* =========================================================
    RESPONSIVE
@@ -1372,6 +1461,10 @@ svg {
 
   .palette {
     gap: 20px 16px;
+  }
+
+  .flip {
+    height: 240px;
   }
 
   .palette__swatch {
