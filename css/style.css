@@ -670,6 +670,10 @@ svg {
 .section {
   position: relative;
   padding: clamp(80px, 12vw, 140px) 16px;
+  /* Slide-in animations start off to the side; never let them cause
+     horizontal scrolling on phones ("clip" where supported) */
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .section--tinted {
