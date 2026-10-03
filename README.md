@@ -3,7 +3,7 @@
 Static single-page wedding invitation with a countdown, schedule, dress code,
 add-to-calendar buttons and an RSVP form backed by Google Sheets.
 
-**Live:** https://gellerdev.github.io/gellerswebsite/
+**Live:** https://gellers.ru/
 
 ## Stack
 
@@ -36,7 +36,7 @@ marked with `TODO` comments in `index.html`.
 ## Personal invitation links
 
 Append `?guest=<greeting>` to the URL to replace the default greeting, e.g.
-`https://gellerdev.github.io/gellerswebsite/?guest=Дорогая бабушка`.
+`https://gellers.ru/?guest=Дорогая бабушка`.
 
 ## RSVP backend
 
@@ -48,3 +48,18 @@ are **not** deployed automatically — redeploy a new version in Apps Script.
 
 Push to `main`. The workflow in `.github/workflows/deploy.yml` publishes only
 the public site files to GitHub Pages.
+
+## Custom domain
+
+The site is served at `gellers.ru`. The custom domain is set in the repository's
+Pages settings (no `CNAME` file is needed with Actions-based deployments).
+
+DNS records (managed at the registrar):
+
+| Type  | Name  | Value                                   |
+|-------|-------|-----------------------------------------|
+| A     | `@`   | `185.199.108.153`                       |
+| A     | `@`   | `185.199.109.153`                       |
+| A     | `@`   | `185.199.110.153`                       |
+| A     | `@`   | `185.199.111.153`                       |
+| CNAME | `www` | `gellerdev.github.io`                   |

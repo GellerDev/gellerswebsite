@@ -94,7 +94,7 @@ document.getElementById('calendar-ics').addEventListener('click', () => {
     'VERSION:2.0',
     'PRODID:-//Wedding//RU',
     'BEGIN:VEVENT',
-    'UID:wedding-20270602@gellerdev.github.io',
+    'UID:wedding-20270602@gellers.ru',
     'DTSTAMP:' + toCalendarDate(new Date()),
     'DTSTART:' + toCalendarDate(CONFIG.weddingStart),
     'DTEND:' + toCalendarDate(CONFIG.weddingEnd),
